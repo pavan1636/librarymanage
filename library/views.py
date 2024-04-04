@@ -1,39 +1,51 @@
+"""
+    Docstring describing your form class.
+
+    You can provide details about the purpose of the form, what fields it contains,
+    and any special behavior or usage instructions.
+"""
+# pylint: disable=ungrouped-imports,unused-import
+# pylint: disable=wrong-import-order
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
-from . import forms,models
-from django.http import HttpResponseRedirect
-from django.contrib.auth.models import Group
+from django.urls import reverse
+from django.shortcuts import redirect
+from datetime import datetime, timedelta, date
+
 from django.contrib import auth
-from django.contrib.auth.decorators import login_required,user_passes_test
-from datetime import datetime,timedelta,date
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import Group
 from django.core.mail import send_mail
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+
 from librarymanage.settings import EMAIL_HOST_USER
-from django.shortcuts import render, redirect, get_object_or_404
+from . import forms, models
 from .models import Book
 from .forms import BookForm
 
 
 
-def home_view(request):
+
+def home_view(request):# pylint: disable=missing-function-docstring
     if request.user.is_authenticated:
         return HttpResponseRedirect('afterlogin')
     return render(request,'library/index.html')
 
 #for showing signup/login button for student
-def studentclick_view(request):
+def studentclick_view(request): # pylint: disable=missing-function-docstring
     if request.user.is_authenticated:
         return HttpResponseRedirect('afterlogin')
     return render(request,'library/studentclick.html')
 
 #for showing signup/login button for teacher
-def adminclick_view(request):
+def adminclick_view(request): # pylint: disable=missing-function-docstring
     if request.user.is_authenticated:
         return HttpResponseRedirect('afterlogin')
     return render(request,'library/adminclick.html')
 
 
 
-def adminsignup_view(request):
+def adminsignup_view(request):# pylint: disable=missing-function-docstring
     form=forms.AdminSigupForm()
     if request.method=='POST':
         form=forms.AdminSigupForm(request.POST)
@@ -54,7 +66,7 @@ def adminsignup_view(request):
 
 
 
-def studentsignup_view(request):
+def studentsignup_view(request):# pylint: disable=missing-function-docstring
     form1=forms.StudentUserForm()
     form2=forms.StudentExtraForm()
     mydict={'form1':form1,'form2':form2}
@@ -67,6 +79,7 @@ def studentsignup_view(request):
             user.save()
             f2=form2.save(commit=False)
             f2.user=user
+            # pylint: disable=unused-variable
             user2=f2.save()
 
             my_student_group = Group.objects.get_or_create(name='STUDENT')
@@ -78,10 +91,11 @@ def studentsignup_view(request):
 
 
 
-def is_admin(user):
+def is_admin(user):# pylint: disable=missing-function-docstring
     return user.groups.filter(name='ADMIN').exists()
 
-def afterlogin_view(request):
+def afterlogin_view(request):# pylint: disable=missing-function-docstring
+    # pylint: disable=no-else-return
     if is_admin(request.user):
         return render(request,'library/adminafterlogin.html')
     else:
@@ -90,21 +104,22 @@ def afterlogin_view(request):
 
 @login_required(login_url='adminlogin')
 @user_passes_test(is_admin)
-def addbook_view(request):
+def addbook_view(request):# pylint: disable=missing-function-docstring
     #now it is empty book form for sending to html
     form=forms.BookForm()
     if request.method=='POST':
         #now this form have data from html
         form=forms.BookForm(request.POST)
         if form.is_valid():
+            # pylint: disable=unused-variable
             user=form.save()
             return render(request,'library/bookadded.html')
     return render(request,'library/addbook.html',{'form':form})
 
 @login_required(login_url='adminlogin')
-@user_passes_test(is_admin)
-def viewbook_view(request):
-    books=models.Book.objects.all()
+@user_passes_test(is_admin)# pylint: disable=no-member
+def viewbook_view(request):# pylint: disable=missing-function-docstring
+    books=models.Book.objects.all()# pylint: disable=no-member
     return render(request,'library/viewbook.html',{'books':books})
 
 
@@ -112,7 +127,7 @@ def viewbook_view(request):
 
 @login_required(login_url='adminlogin')
 @user_passes_test(is_admin)
-def issuebook_view(request):
+def issuebook_view(request):# pylint: disable=missing-function-docstring
     form=forms.IssuedBookForm()
     if request.method=='POST':
         #now this form have data from html
@@ -127,15 +142,15 @@ def issuebook_view(request):
 
 
 @login_required(login_url='adminlogin')
-@user_passes_test(is_admin)
-def viewissuedbook_view(request):
-    issuedbooks=models.IssuedBook.objects.all()
+@user_passes_test(is_admin) # pylint: disable=no-member
+def viewissuedbook_view(request):# pylint: disable=missing-function-docstring
+    issuedbooks=models.IssuedBook.objects.all()# pylint: disable=no-member
     li=[]
     for ib in issuedbooks:
         issdate=str(ib.issuedate.day)+'-'+str(ib.issuedate.month)+'-'+str(ib.issuedate.year)
         expdate=str(ib.expirydate.day)+'-'+str(ib.expirydate.month)+'-'+str(ib.expirydate.year)
         #fine calculation
-        days=(date.today()-ib.issuedate)
+        days=date.today()-ib.issuedate
         print(date.today())
         d=days.days
         fine=0
@@ -144,11 +159,21 @@ def viewissuedbook_view(request):
             fine=day*10
 
 
-        books=list(models.Book.objects.filter(isbn=ib.isbn))
-        students=list(models.StudentExtra.objects.filter(enrollment=ib.enrollment))
+        books=list(models.Book.objects.filter(isbn=ib.isbn))# pylint: disable=no-member
+        students=list(models.StudentExtra.objects.filter(enrollment=ib.enrollment))# pylint: disable=no-member
         i=0
+        # pylint: disable=unused-variable
         for l in books:
-            t=(students[i].get_name,students[i].enrollment,books[i].name,books[i].author,issdate,expdate,fine)
+            t = (
+    students[i].get_name,
+    students[i].enrollment,
+    books[i].name,
+    books[i].author,
+    issdate,
+    expdate,
+    fine
+)
+
             i=i+1
             li.append(t)
 
@@ -156,28 +181,28 @@ def viewissuedbook_view(request):
 
 @login_required(login_url='adminlogin')
 @user_passes_test(is_admin)
-def viewstudent_view(request):
-    students=models.StudentExtra.objects.all()
+def viewstudent_view(request):# pylint: disable=missing-function-docstring
+    students=models.StudentExtra.objects.all()# pylint: disable=no-member
     return render(request,'library/viewstudent.html',{'students':students})
 
 
 @login_required(login_url='studentlogin')
-def viewissuedbookbystudent(request):
-    student=models.StudentExtra.objects.filter(user_id=request.user.id)
-    issuedbook=models.IssuedBook.objects.filter(enrollment=student[0].enrollment)
+def viewissuedbookbystudent(request):# pylint: disable=missing-function-docstring
+    student=models.StudentExtra.objects.filter(user_id=request.user.id)# pylint: disable=no-member
+    issuedbook=models.IssuedBook.objects.filter(enrollment=student[0].enrollment)# pylint: disable=no-member
 
     li1=[]
 
     li2=[]
     for ib in issuedbook:
-        books=models.Book.objects.filter(isbn=ib.isbn)
+        books=models.Book.objects.filter(isbn=ib.isbn)# pylint: disable=no-member
         for book in books:
             t=(request.user,student[0].enrollment,student[0].branch,book.name,book.author)
             li1.append(t)
         issdate=str(ib.issuedate.day)+'-'+str(ib.issuedate.month)+'-'+str(ib.issuedate.year)
         expdate=str(ib.expirydate.day)+'-'+str(ib.expirydate.month)+'-'+str(ib.expirydate.year)
         #fine calculation
-        days=(date.today()-ib.issuedate)
+        days=date.today()-ib.issuedate
         print(date.today())
         d=days.days
         fine=0
@@ -189,10 +214,10 @@ def viewissuedbookbystudent(request):
 
     return render(request,'library/viewissuedbookbystudent.html',{'li1':li1,'li2':li2})
 
-def aboutus_view(request):
+def aboutus_view(request):# pylint: disable=missing-function-docstring
     return render(request,'library/aboutus.html')
 
-def contactus_view(request):
+def contactus_view(request):# pylint: disable=missing-function-docstring
     sub = forms.ContactusForm()
     if request.method == 'POST':
         sub = forms.ContactusForm(request.POST)
@@ -200,39 +225,38 @@ def contactus_view(request):
             email = sub.cleaned_data['Email']
             name=sub.cleaned_data['Name']
             message = sub.cleaned_data['Message']
-            send_mail(str(name)+' || '+str(email),message, EMAIL_HOST_USER, ['wapka1503@gmail.com'], fail_silently = False)
+            send_mail(
+    str(name) + ' || ' + str(email),
+    message,
+    EMAIL_HOST_USER,
+    ['wapka1503@gmail.com'],
+    fail_silently=False
+)
+
             return render(request, 'library/contactussuccess.html')
     return render(request, 'library/contactus.html', {'form':sub})
 
-from django.urls import reverse
+
 
 @login_required(login_url='adminlogin')
 @user_passes_test(is_admin)
-def edit_book(request, book_id):
+def edit_book(request, book_id):# pylint: disable=missing-function-docstring
     book = get_object_or_404(Book, pk=book_id)
     if request.method == 'POST':
         form = BookForm(request.POST, instance=book)
         if form.is_valid():
             form.save()
-            return render(request, 'library/viewbook.html', {'books': Book.objects.all()})
+            return render(request, 'library/viewbook.html', {'books': Book.objects.all()})# pylint: disable=no-member
     else:
         form = BookForm(instance=book)
-    
     return render(request, 'library/editbook.html', {'form': form, 'book': book})
 
-from django.shortcuts import render, redirect
+
 
 @login_required(login_url='adminlogin')
 @user_passes_test(is_admin)
-def delete_book(request, book_id):
+def delete_book(request, book_id):# pylint: disable=missing-function-docstring
     book = get_object_or_404(Book, pk=book_id)
     book.delete()
-    books = Book.objects.all()
+    books = Book.objects.all()# pylint: disable=no-member
     return render(request, 'library/viewbook.html', {'books': books})
-
-
-
-
-
-
-

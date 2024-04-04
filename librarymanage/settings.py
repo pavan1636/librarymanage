@@ -20,7 +20,7 @@ SECRET_KEY = 'hsirs13pfzv4w%6(6j4_7%#c^yfh%s!a$#g@%d9!w5pzp^l^k)'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['ephemeralapi-env.eba-tzdq2pqs.eu-west-1.elasticbeanstalk.com']
+ALLOWED_HOSTS = ['ephemeralapi-env.eba-tzdq2pqs.eu-west-1.elasticbeanstalk.com','127.0.0.1']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
