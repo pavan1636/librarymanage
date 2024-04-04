@@ -1,0 +1,54 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+  pre_build:
+    commands:
+      - echo "Installing dependencies"
+      - pip install -r requirements.txt
+      - pip install pylint
+      # Add any other pre-build commands here
+  build:
+    commands:
+      - echo "No build step required for Django project"
+      # Add any other build commands here, if needed
+  post_build:
+    commands:
+      - echo "Running pylint for Python code rating"
+      - pylint $CODEBUILD_SRC_DIR/*.py > pylint_report.txt || true
+      - cat pylint_report.txt
+      - echo "Applying migrations"
+      - python manage.py migrate
+      - echo "Deploying Django project to Elastic Beanstalk"
+ 
+      # Add any other post-build commands here, if needed
+
+# version: 0.2
+
+# phases:
+#   install:
+#     runtime-versions:
+#       python: 3.11
+#   pre_build:
+#     commands:
+#       - echo "Installing dependencies"
+#       - pip install -r requirements.txt
+#       # Install pylint
+#       - pip install pylint
+#       # Add any other pre-build commands here
+#   build:
+#     commands:
+#       - echo "No build step required for Django project"
+#       # Add any other build commands here, if needed
+#   post_build:
+#     commands:
+#       - echo "Applying migrations"
+#       - python manage.py migrate
+#       - echo "Deploying Django project to Elastic Beanstalk"
+#       # Run pylint for Python code rating
+#       - echo "Running pylint for Python code rating"
+#       - pylint $CODEBUILD_SRC_DIR/*.py > pylint_report.txt || true
+#       - cat pylint_report.txt
+

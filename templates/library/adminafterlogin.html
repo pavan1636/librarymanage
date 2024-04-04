@@ -1,0 +1,121 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <style media="screen">
+    .btn-circle.btn-xl {
+      width: 70px;
+      height: 70px;
+      padding: 10px 16px;
+      border-radius: 35px;
+      font-size: 24px;
+      line-height: 1.33;
+    }
+
+    .btn-circle {
+      width: 30px;
+      height: 30px;
+      padding: 6px 0px;
+      border-radius: 15px;
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.42857;
+    }
+
+    .jumbotron {
+      margin-top: 0px;
+      margin-bottom: 0px;
+      background-color: #FFDAB9;
+      /* Light orange background color */
+    }
+
+    .jumbotron h1 {
+      text-align: center;
+      color: #aa082e;
+      /* Dark red text color */
+    }
+
+    .lead {
+      color: #000;
+      /* Black text color */
+    }
+
+    .options {
+      text-align: center;
+    }
+
+    .card {
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+      transition: 0.3s;
+      text-align: center;
+    }
+
+    .card:hover {
+      box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .container {
+      padding: 2px 16px;
+    }
+  </style>
+</head>
+
+<body>
+  {% include "library/navbaradmin.html" %}
+
+
+  <div class="jumbotron">
+    <h1 class="display-4">Hello {{user.first_name}}!</h1>
+    <p class="lead">As you are an Admin, you can add a book to the library, view available books, issue books to
+      students, view issued books, and many more!</p>
+    <hr class="my-4">
+    <p>Options Available For You:</p>
+    <div class="container">
+      <div class="card">
+        <div class="container">
+          <h4><b>Add Book To Library</b></h4>
+          <a href="addbook" class="btn btn-primary btn-lg active" style="border-radius: 0%;" role="button"
+            aria-pressed="true">Add Book</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="container">
+          <h4><b>View Available Book</b></h4>
+          <a href="viewbook" class="btn btn-primary btn-lg active" style="border-radius: 0%;" role="button"
+            aria-pressed="true">View Book</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="container">
+          <h4><b>Issue New Book</b></h4>
+          <a href="issuebook" class="btn btn-primary btn-lg active" style="border-radius: 0%;" role="button"
+            aria-pressed="true">Issue Book</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="container">
+          <h4><b>View Issued Book</b></h4>
+          <a href="viewissuedbook" class="btn btn-primary btn-lg active" style="border-radius: 0%;" role="button"
+            aria-pressed="true">View Issued Books</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="container">
+          <h4><b>View Student</b></h4>
+          <a href="viewstudent" class="btn btn-primary btn-lg active" style="border-radius: 0%;" role="button"
+            aria-pressed="true">View Students</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  {% include "library/footer.html" %}
+</body>
+
+</html>
