@@ -38,7 +38,11 @@ phases:
       # Print current directory again
       - pwd
       # Export SonarScanner bin directory to PATH
-      - export PATH=$PATH:$(pwd)/sonar-scanner/bin
+      - export PATH=$PATH:$(pwd)/sonar-scanner-cli-4.6.2.2472-linux/bin
+      # Check SonarScanner version
+      - sonar-scanner --version
+      # Check the installation path of SonarScanner
+      - which sonar-scanner
 
   build:
     commands:
@@ -56,4 +60,3 @@ phases:
 artifacts:
   files:
     - '**/*'
-
