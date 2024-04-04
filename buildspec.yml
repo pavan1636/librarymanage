@@ -27,36 +27,55 @@ phases:
     runtime-versions:
       python: 3.11
     commands:
+      # Install necessary dependencies (adjust as needed)
+      - apt-get update && apt-get install -y curl jq python3-pip
+
       - pip install --upgrade pip
       - pip install -r requirements.txt
       - pip install pylint
-      # Print current directory
-      - pwd
-      # Download and extract SonarScanner
-      - curl -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip -o sonar-scanner.zip
-      - unzip sonar-scanner.zip
-      # Print current directory again
-      - pwd
-      # Export SonarScanner bin directory to PATH
-      - export PATH=$PATH:$(pwd)/sonar-scanner-cli-4.6.2.2472-linux/bin
-      # Check SonarScanner version
-      - sonar-scanner --version
-      # Check the installation path of SonarScanner
-      - which sonar-scanner
+      
+      # Set retry count variable
+      - retry_count=3
+
+      # Download Apache Maven with retry
+      - for i in $(seq 1 $retry_count); do wget https://archive.apache.org/dist/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz && break || sleep 10; done
+      
+      # Extract Apache Maven
+      - tar xzf apache-maven-3.8.5-bin.tar.gz || true
+      
+      # Create symbolic link to Maven
+      - ln -s apache-maven-3.8.5 maven
+      
+      # Download SonarScanner
+      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+      
+      # Extract SonarScanner
+      - unzip sonar-scanner-cli-4.6.2.2472-linux.zip
 
   build:
-    commands:
-      # Your build commands here
-
-  post_build:
     commands:
       # Run pylint
       - pylint $CODEBUILD_SRC_DIR/*.py
       - pylint $CODEBUILD_SRC_DIR/library/*.py
 
-      # Run SonarScanner analysis
-      - sonar-scanner -Dsonar.projectKey=pavan1636_librarymanage -Dsonar.organization=pavan1636 -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=4fbc61e1d8b02d5df3f3772fa810388bba200144
+      # Run Maven command for SonarQube analysis
+      - mvn clean verify sonar:sonar -Dsonar.login=4fbc61e1d8b02d5df3f3772fa810388bba200144 -Dsonar.host.url=https://sonarcloud.io -Dsonar.projectKey=pavan1636_librarymanage -Dsonar.organization=pavan1636 || true
+
+
+      # Wait for a short period
+      - sleep 5
+      
+      # Retrieve SonarQube project status and save it to a JSON file
+      - curl -sS "https://sonarcloud.io/api/qualitygates/project_status?projectKey=YOUR_PROJECT_KEY" -o result.json
+
+      # Display contents of result.json
+      - cat result.json
+
+  post_build:
+    commands:
+      # Your post-build commands here
 
 artifacts:
   files:
     - '**/*'
+
