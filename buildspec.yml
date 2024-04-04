@@ -30,10 +30,15 @@ phases:
       - pip install --upgrade pip
       - pip install -r requirements.txt
       - pip install pylint
-      # Install SonarScanner
+      # Print current directory
+      - pwd
+      # Download and extract SonarScanner
       - curl -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip -o sonar-scanner.zip
       - unzip sonar-scanner.zip
-      - export PATH=$PATH:/path/to/sonar-scanner/bin
+      # Print current directory again
+      - pwd
+      # Export SonarScanner bin directory to PATH
+      - export PATH=$PATH:$(pwd)/sonar-scanner/bin
 
   build:
     commands:
@@ -51,3 +56,4 @@ phases:
 artifacts:
   files:
     - '**/*'
+
