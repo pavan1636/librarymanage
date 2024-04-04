@@ -1,3 +1,25 @@
+# version: 0.2
+
+# phases:
+#   install:
+#     runtime-versions:
+#       python: 3.11
+#     commands:
+#       - pip install --upgrade pip
+#       - pip install -r requirements.txt
+#       - pip install pylint
+#       # Add any other pre-build commands here
+
+#   post_build:
+#     commands:
+#       - python --version
+#       - pylint $CODEBUILD_SRC_DIR/*.py
+#       - pylint $CODEBUILD_SRC_DIR/library/*.py
+
+# artifacts:
+#   files:
+#     - '**/*'
+
 version: 0.2
 
 phases:
@@ -8,15 +30,24 @@ phases:
       - pip install --upgrade pip
       - pip install -r requirements.txt
       - pip install pylint
-      # Add any other pre-build commands here
+      # Install SonarScanner
+      - curl -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip -o sonar-scanner.zip
+      - unzip sonar-scanner.zip
+      - export PATH=$PATH:/path/to/sonar-scanner/bin
+
+  build:
+    commands:
+      # Your build commands here
 
   post_build:
     commands:
-      - python --version
+      # Run pylint
       - pylint $CODEBUILD_SRC_DIR/*.py
       - pylint $CODEBUILD_SRC_DIR/library/*.py
+
+      # Run SonarScanner analysis
+      - sonar-scanner -Dsonar.projectKey=pavan1636_librarymanage -Dsonar.organization=pavan1636 -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=4fbc61e1d8b02d5df3f3772fa810388bba200144
 
 artifacts:
   files:
     - '**/*'
-
