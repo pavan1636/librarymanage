@@ -37,7 +37,7 @@ phases:
       - echo "Installing corretto (OpenJDK) version 21 ..."
       - export JAVA_HOME="$JAVA_21_HOME"
       - export JDK_HOME="$JDK_21_HOME"
-      - for tool_path in "$JAVA_HOME"/bin/*
+      # - for tool_path in "$JAVA_HOME"/bin/*
       - export GRADLE_VERSION=$GRADLE_85_VERSION
       - unlink /usr/bin/gradle
       - ln -s /usr/local/gradle-$GRADLE_85_VERSION/bin/gradle /usr/bin/gradle
