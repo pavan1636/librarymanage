@@ -28,8 +28,8 @@ phases:
       python: 3.11
     commands:
       # Install necessary dependencies (adjust as needed)
-      - sudo apt-get update
-      - sudo apt-get install -y curl jq python3-pip
+      - sudo yum update -y
+      - sudo yum install -y curl jq python3-pip
       
       - pip install --upgrade pip
       - pip install -r requirements.txt
@@ -78,4 +78,5 @@ phases:
 artifacts:
   files:
     - '**/*'
+
 
