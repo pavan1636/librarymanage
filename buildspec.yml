@@ -34,45 +34,33 @@ phases:
       - pip install --upgrade pip
       - pip install -r requirements.txt
       - pip install pylint
-      
+      - echo "Installing corretto (OpenJDK) version 21 ..."
+      - export JAVA_HOME="$JAVA_21_HOME"
+      - export JDK_HOME="$JDK_21_HOME"
+      - for tool_path in "$JAVA_HOME"/bin/*
+      - export GRADLE_VERSION=$GRADLE_85_VERSION
+      - unlink /usr/bin/gradle
+      - ln -s /usr/local/gradle-$GRADLE_85_VERSION/bin/gradle /usr/bin/gradle
+      - yum update -y
+      - yum install -y jq
+      - retry_count=3
+      - for i in $(seq 1 $retry_count); do wget https://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && break || sleep 10; done
+      - tar xzf apache-maven-3.5.4-bin.tar.gz || true
+      - ln -s apache-maven-3.5.4 maven
+      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.3.0.1492-linux.zip
+      - unzip ./sonar-scanner-cli-3.3.0.1492-linux.zip
+      - mvn sonar:sonar -Dsonar.login=58d27d02c7dba8aa6e7568e6ac85d93b5946741b -Dsonar.host.url=https://sonarcloud.io -Dsonar.projectKey=24devopsproject -Dsonar.organization=PDDeshmukh116 || true
+      - sleep 5
+      - curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=24devopsproject >result.json
       # Set retry count variable
       - retry_count=3
-
-      # Download Apache Maven with retry
-      - for i in $(seq 1 $retry_count); do wget https://archive.apache.org/dist/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz && break || sleep 10; done
-      
-      # Extract Apache Maven
-      - tar xzf apache-maven-3.8.5-bin.tar.gz || true
-      
-      # Create symbolic link to Maven
-      - ln -s apache-maven-3.8.5 maven
-      
-      # Download SonarScanner
-      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
-      
-      # Extract SonarScanner
-      - unzip sonar-scanner-cli-4.6.2.2472-linux.zip
+      - cat result.json
 
   build:
     commands:
       # Run pylint
       - pylint $CODEBUILD_SRC_DIR/*.py
       - pylint $CODEBUILD_SRC_DIR/library/*.py
-
-      # Run Maven command for SonarQube analysis
-      - project_dir=$(find $CODEBUILD_SRC_DIR -name pom.xml -exec dirname {} \;)
-      - cd $project_dir
-      - echo "Current directory: $(pwd)"  # Print the current directory for verification
-      - ./maven/bin/mvn clean verify sonar:sonar -Dsonar.login=4fbc61e1d8b02d5df3f3772fa810388bba200144 -Dsonar.host.url=https://sonarcloud.io -Dsonar.projectKey=pavan1636_librarymanage -Dsonar.organization=pavan1636 || true
-      
-      # Wait for a short period
-      - sleep 5
-      
-      # Retrieve SonarQube project status and save it to a JSON file
-      - curl -sS "https://sonarcloud.io/api/qualitygates/project_status?projectKey=pavan1636_librarymanage" -o result.json
-
-      # Display contents of result.json
-      - cat result.json
 
   post_build:
     commands:
