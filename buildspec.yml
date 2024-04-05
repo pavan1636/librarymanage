@@ -60,6 +60,9 @@ phases:
       - pylint $CODEBUILD_SRC_DIR/library/*.py
 
       # Run Maven command for SonarQube analysis
+      - project_dir=$(find $CODEBUILD_SRC_DIR -name pom.xml -exec dirname {} \;)
+      - cd $project_dir
+      - echo "Current directory: $(pwd)"  # Print the current directory for verification
       - ./maven/bin/mvn clean verify sonar:sonar -Dsonar.login=4fbc61e1d8b02d5df3f3772fa810388bba200144 -Dsonar.host.url=https://sonarcloud.io -Dsonar.projectKey=pavan1636_librarymanage -Dsonar.organization=pavan1636 || true
       
       # Wait for a short period
