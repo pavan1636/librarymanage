@@ -29,7 +29,7 @@ phases:
     commands:
       # Install necessary dependencies (adjust as needed)
       - sudo yum update -y
-      - sudo yum install -y curl jq python3-pip
+      - sudo yum install -y curl jq python3-pip --allowerasing
       
       - pip install --upgrade pip
       - pip install -r requirements.txt
